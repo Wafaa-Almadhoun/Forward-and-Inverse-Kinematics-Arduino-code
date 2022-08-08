@@ -23,205 +23,316 @@ Project is created with:
 * AUTODESK TINKERCAD [Open](https://www.tinkercad.com/)
 	
 ## Components required
-### 1. Unipolar Stepper with ULN2003 
+
     1. Arduino UNO
     2. jumper wirs
     3. 3 servo motor 
-    4. bettrey  5 v 
+    4. power supply 5 v
     5. breadboard
   
    
 ## Connections
 
+    Connect the 5 v output of the power supply to the positive rail of the breadboard
 
+    Connect the ground to the negative rail of the breadboard
+    
+    Connect the +ve and GND of servos in breadboard
+    
+    connect signal pin of servos to pin 9 , 10 and 11 on Arduino uno 
+    
+    Connect the arduino with you laptop 
      
 ## Block diagram & simulation
-### 1. Unipolar Stepper with ULN2003 . [see here](https://github.com/Wafaa-Almadhoun/Stepper-motor-using-Arduino-UNO-R3-/blob/main/stepper%20using%20ULN2003.pdsprj)
-##### Slow - 4-step CW sequence to observe lights on driver board
-![1](https://user-images.githubusercontent.com/64277741/179306291-f9684758-deaf-4828-9520-757a142ba537.PNG)
-Figure (1): Stepper Motor at 90 degree after 1-step CW sequence
-![2](https://user-images.githubusercontent.com/64277741/179307189-82e1089f-4cbb-403a-b78c-a4c990c24522.PNG)
-Figure (2): Stepper Motor at 180 degree after 2-step CW sequence
-![3](https://user-images.githubusercontent.com/64277741/179307421-bbcf698d-139f-4d30-aae9-9546c057fb68.PNG)
-Figure (3): Stepper Motor at 270 degree after 3-step CW sequence
-![4](https://user-images.githubusercontent.com/64277741/179307644-0f9d39bf-591d-45a1-b9c4-d38ec8528d7d.PNG)
-Figure (4): Stepper Motor at 342 degree after 4-step CW sequence
-##### Rotate CW 1/2 turn slowly
-![5](https://user-images.githubusercontent.com/64277741/179308867-85dbccdc-5070-4164-82c7-9776d4b09fc9.PNG)
-Figure (5): Rotate CW 1/2 turn slowly
-##### Rotate CCW 1/2 turn quickly
-![6](https://user-images.githubusercontent.com/64277741/179309329-1eed85e5-3f0d-48a3-b2be-3d9a40e71869.PNG)
-Figure (6): Rotate CCW 1/2 turn quickly
+
+### Forward Kinematics . [see here](https://www.tinkercad.com/things/4MeRcJJYusd-forward-kinematics/editel)
+
+![1](https://user-images.githubusercontent.com/64277741/183325896-6c049744-3ec9-4727-bc19-c203e5e7db1c.png)
+
+Figure (1): Befor run the cod 
+
+![2](https://user-images.githubusercontent.com/64277741/183325953-2ecc2741-3d5c-4fe3-a951-56201a72cd20.png)
+
+Figure (2): initial position
+
+![3](https://user-images.githubusercontent.com/64277741/183326050-6cf46d9a-2f39-49e1-8f84-1e49cd68912c.png)
+
+Figure (3): Enter valus into Serial Monitor for links length 
+
+![4](https://user-images.githubusercontent.com/64277741/183326256-272f96e3-a5b9-4c93-b51f-9b2d552a0021.png)
+
+Figure (4) : Enter valus into Serial Monitor for angles
+
+![5](https://user-images.githubusercontent.com/64277741/183326492-14a0f4b7-cebf-4710-97f5-6c4b0481f9ac.png)
+
+Figure (5) : The result of X , Y and total degree
+
 
 #### The Code 
- Demonstrates 28BYJ-48 Unipolar Stepper with ULN2003 Driver
- 
-  Uses Arduino Stepper Library
- 
-//Include the Arduino Stepper Library
+ //Forward-Kinematics
+#include <Servo.h>
+Servo motor1;
+Servo motor2;
+Servo motor3;
 
-#include <Stepper.h>
- 
-// Define Constants
- 
-// Number of steps per internal motor revolution 
+ // length of each link (arm)  
+float L1;
+float L2;
+float L3;
 
-const float STEPS_PER_REV = 32; 
- 
-//  Amount of Gear Reduction
 
-const float GEAR_RED = 64;
- 
-// Number of steps per geared output rotation
+float pi = 3.14159265359;
 
-const float STEPS_PER_OUT_REV = STEPS_PER_REV * GEAR_RED;
- 
-// Define Variables
- 
-// Number of Steps Required
 
-int StepsRequired;
- 
-// Create Instance of Stepper Class
-
-// Specify Pins used for motor coils
-
-// The pins used are 8,9,10,11 
-
-// Connected to ULN2003 Motor Driver In1, In2, In3, In4 
-
-// Pins entered in sequence 1-3-2-4 for proper step sequencing
- 
-Stepper steppermotor(STEPS_PER_REV, 8, 10, 9, 11);
- 
-void setup()
+void setup() 
 {
-
-// Nothing  (Stepper Library sets pins as outputs)
-
+    Serial.begin(9600);
+  motor1.attach(9);
+  motor2.attach(10);
+  motor3.attach(11);
+  
+  //initial position 
+  
+  motor1.write(90);
+  motor2.write(90);
+  motor3.write(90);
+  
 }
- 
-void loop()
-{
+void loop() {
 
-  // Slow - 4-step CW sequence to observe lights on driver board
+  // Enter the input data joint-1-angle , joint-2-angle , joint-3-angle , link-1-length , link-2-length , link-3-length ) 
+  // we have get (x,y) gripper position and total degree
   
-  steppermotor.setSpeed(1);    
-  
-  StepsRequired  =  4;
-  
-  steppermotor.step(StepsRequired);
-  
-  delay(2000);
- 
-   // Rotate CW 1/2 turn slowly
+ Serial.println("Enter the length of the first link L1");
+ while(Serial.available()==0){}
+ L1=Serial.parseFloat();
+ Serial.print("L1 is "); 
+ Serial.println(L1);
    
-  StepsRequired  =  STEPS_PER_OUT_REV / 2; 
-  
-  steppermotor.setSpeed(100);   
-  
-  steppermotor.step(StepsRequired);
-  
-  delay(1000);
-  
-  // Rotate CCW 1/2 turn quickly
-  
-  StepsRequired  =  - STEPS_PER_OUT_REV / 2;   
-  
-  steppermotor.setSpeed(700);  
-  
-  steppermotor.step(StepsRequired);
-  
-  delay(2000);
+ Serial.println("Enter the length of the second link L2");
+ while(Serial.available()==0){}
+ L2=Serial.parseFloat();
+ Serial.print("L2 is "); 
+ Serial.println(L2);
+
+ Serial.println("Enter the length of the third link L3");
+ while(Serial.available()==0){}
+ L3=Serial.parseFloat();
+ Serial.print("L3 is "); 
+ Serial.println(L3);
+
+// angles between links of robot arm
+float angle1 ;
+float angle2;
+float angle3;
+float angleTotal;      
  
-}
+float radAngle1;
+float radAngle2;
+float radAngle3;
+float radAngleTotal;
 
-### 2. Bipolar Stepper with L293D Motor Driver IC .[see here ](https://github.com/Wafaa-Almadhoun/Stepper-motor-using-Arduino-UNO-R3-/blob/main/Bipolar%20Stepper%20with%20L293D%20Motor%20Driver%20IC.pdsprj)
-![1](https://user-images.githubusercontent.com/64277741/179328636-268173e6-09b8-46fb-9431-1dfe2eae640f.PNG)
-Figure (7): step one revolution in the other direction ("counterclockwise")
+// to compute end effector
+float x;      
+float y;
+float x1;
+float x2;
+float y1;
+float y2;             
 
- ![2](https://user-images.githubusercontent.com/64277741/179328701-3dee3532-ada8-4ae9-abdd-f15dcee8762f.PNG)
-Figure (8): step one revolution in one direction ("clockwise")
+  Serial.println("Enter angle1 ");
+  while(Serial.available()==0){}
+  angle1=Serial.parseFloat();
+  Serial.print("angle1 = "); 
+  Serial.println(angle1);
+  
+  Serial.println("Enter angle2 ");
+  while(Serial.available()==0){}
+  angle2=Serial.parseFloat();
+  Serial.print("angle2 = "); Serial.println(angle2);
+
+  Serial.println("Enter angle3 ");
+  while(Serial.available()==0){}
+  angle3=Serial.parseFloat();
+  Serial.print("angle3 = "); Serial.println(angle3);
+  
+// convert from radians to degrees 
+  radAngle1 = (angle1*pi)/180;    
+  radAngle2 = (angle2*pi)/180;
+  radAngle3 = (angle3*pi)/180;
+  radAngleTotal = (angleTotal*pi)/180;
+  
+  motor1.write(angle1); 
+  motor2.write(angle2);
+  motor3.write(angle3);
+  
+  x = L1 * cos(radAngle1) +L2 * cos(radAngle1 + radAngle2) + L3 * cos(radAngle1 + radAngle2 + radAngle3);
+  y = L1 * sin(radAngle1) +L2 * sin (radAngle1 + radAngle2)+ L3 * sin (radAngle1 + radAngle2 + radAngle3);
+  angleTotal = angle1 + angle2 + angle3;
+   delay(1000);    
+
+
+  
+ Serial.print("x is "); Serial.println(x);
+ Serial.print("y is = "); Serial.println(y); 
+ Serial.print("Total angle is "); Serial.println(angleTotal);
+ Serial.print("angle1 "); Serial.println(angle1);
+ Serial.print("angle2 "); Serial.println(angle2);
+ Serial.print("angle3 "); Serial.println(angle3);
+
+
+ }
+
+
+### 2.inverse-kinematics.[see here ](https://www.tinkercad.com/things/cQybxJfa4Cd-inverse-kinematics/editel)
+
+![1](https://user-images.githubusercontent.com/64277741/183326947-43289a42-bef3-44eb-a923-3c2ccda88d6c.png)
+
+
+Figure (1): Befor run the cod 
+
+![2](https://user-images.githubusercontent.com/64277741/183326967-b5cf4137-2dfd-4aa1-8bae-feba16ff2f0f.png)
+
+Figure (2): initial position
+
+![3](https://user-images.githubusercontent.com/64277741/183326985-0fa904e8-aa7c-4b38-a2f5-ce357a653d84.png)
+
+Figure (3): Enter valus into Serial Monitor for links length 
+
+![4](https://user-images.githubusercontent.com/64277741/183327019-8bb4e2e6-e4c3-4cd5-9eb0-aecc757f251c.png)
+
+
+Figure (4) : Enter valus into Serial Monitor of X , Y and total degree
+
+![5](https://user-images.githubusercontent.com/64277741/183327157-8a1917e0-b2ec-4c86-9a94-b0ae33a7df79.png)
+
+Figure (5) : The result of 3 angles
 
 #### The code 
 
-// Include the Arduino Stepper Library
-#include <Stepper.h>
+// inverse-kinematics
 
-// Number of steps per output rotation NEMA 17
+#include <Servo.h>
+Servo motor1;
+Servo motor2;
+Servo motor3;
 
-const int stepsPerRevolution = 200; 
+ // length of each link (arm)  
+float L1;
+float L2;
+float L3;
 
-// Create Instance of Stepper library
 
-Stepper myStepper(stepsPerRevolution, 12, 11, 10, 9);
+float pi = 3.14159265359;
 
 
-void setup()
+void setup() 
 {
-  // set the speed at 20 rpm:
+    Serial.begin(9600);
+  motor1.attach(9);
+  motor2.attach(10);
+  motor3.attach(11);
+
   
-  myStepper.setSpeed(20);
+  //initial position 
+  motor1.write(90);
+  motor2.write(90);
+  motor3.write(90);
+
+  
   
 }
 
-void loop() 
-{
-  // step one revolution in one direction:
-  
-  myStepper.step(stepsPerRevolution);
-  
-  delay(1000);
-
-  // step one revolution in the other direction:
-  
-  myStepper.step(-stepsPerRevolution);
-  
-  delay(1000);
-}
-
-
-### 3. BIG Stepper Motors NEMA 23 Bipolar with DM860A Microstep Driver  
-![3BIG Stepper Motors NEMA 23 Bipolar with DM860A Microstep Driver](https://user-images.githubusercontent.com/64277741/179338072-d89222ff-f4ea-4005-a69e-4427b546f48d.png)
-
-#### The Code 
-// Defin pins
- 
-int reverseSwitch = 2;  // Push button for reverse
-int driverPUL = 7;    // PUL- pin
-int driverDIR = 6;    // DIR- pin
-int spd = A0;     // Potentiometer
- 
-// Variables
- 
-int pd = 500;       // Pulse Delay period
-boolean setdir = LOW; // Set Direction
- 
-// Interrupt Handler
- 
-void revmotor (){
- 
-  setdir = !setdir;
-  
-}
- 
- 
-void setup() {
- 
-  pinMode (driverPUL, OUTPUT);
-  pinMode (driverDIR, OUTPUT);
-  attachInterrupt(digitalPinToInterrupt(reverseSwitch), revmotor, FALLING);
-  
-}
- 
 void loop() {
-  
-    pd = map((analogRead(spd)),0,1023,2000,50);
-    digitalWrite(driverDIR,setdir);
-    digitalWrite(driverPUL,HIGH);
-    delayMicroseconds(pd);
-    digitalWrite(driverPUL,LOW);
-    delayMicroseconds(pd);
- 
-}
 
+
+  // Enter the input data  , link-1-length , link-2-length , link-3-length ,(x,y) gripper position and total degree
+   
+  // we have get joint-1-angle , joint-2-angle , joint-3-angle 
+  
+ Serial.println("Enter the length of the first link L1");
+ while(Serial.available()==0){}
+ L1=Serial.parseFloat();
+ Serial.print("L1 is "); 
+ Serial.println(L1);
+   
+ Serial.println("Enter the length of the second link L2");
+ while(Serial.available()==0){}
+ L2=Serial.parseFloat();
+ Serial.print("L2 is "); 
+ Serial.println(L2);
+
+ Serial.println("Enter the length of the third arm L3");
+ while(Serial.available()==0){}
+ L3=Serial.parseFloat();
+ Serial.print("L3 is "); 
+ Serial.println(L3);
+
+
+
+     // angles between links of robot arm
+float angle1 ;
+float angle2;
+float angle3;
+float angleTotal;      
+ 
+float radAngle1;
+float radAngle2;
+float radAngle3;
+float radAngleTotal;
+
+// to compute end effector
+float x;      
+float y;
+float x1;
+float x2;
+float y1;
+float y2; 
+
+Serial.println("Enter the value x ");
+      while(Serial.available()==0){}
+      x=Serial.parseFloat();
+      Serial.print("x is "); Serial.println(x);
+      
+      Serial.println("Enter the value y ");
+      while(Serial.available()==0){}
+      y=Serial.parseFloat();
+      Serial.print("y is "); Serial.println(y);
+
+      Serial.println("Enter the Total Angle");
+      while(Serial.available()==0){}
+      angleTotal=Serial.parseFloat();
+      Serial.print("total angle is  ");Serial.println(angleTotal);
+      
+ // convert from radians to degrees 
+ 
+  radAngleTotal = (angleTotal*pi)/180;
+  
+  x2=x-L3*cos(radAngleTotal);
+  y2=y-L3*sin(radAngleTotal);   
+  radAngle2 = acos((sq(x2)+ sq(y2) - sq(L1) - sq(L2)) / (2*L1*L2));
+  radAngle1= acos(((L1 + L2 * cos(radAngle2))*x2+(L2 * y2 * sin(radAngle2))) / (sq(x2)+ sq(y2)));
+
+      angle1= (radAngle1*180)/pi;
+      angle2= (radAngle2*180)/pi;
+      angle3= angleTotal-angle1-angle2;
+       delay(1000);    
+
+      motor1.write(angle1); 
+      motor2.write(angle2);
+      motor3.write(angle3);
+      x1 = L1 * cos(radAngle1) ;
+      y1 = L1 * sin(radAngle1) ;
+  
+ Serial.print("angle1 is "); Serial.println(angle1);
+ Serial.print("angle2 is "); Serial.println(angle2);
+ Serial.print("angle3 is "); Serial.println(angle3);
+ 
+ 
+
+
+ }
+
+
+
+ 
