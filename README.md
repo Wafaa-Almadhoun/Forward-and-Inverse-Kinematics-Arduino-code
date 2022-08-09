@@ -49,7 +49,7 @@ Project is created with:
 
 ![1](https://user-images.githubusercontent.com/64277741/183325896-6c049744-3ec9-4727-bc19-c203e5e7db1c.png)
 
-Figure (1): Befor run the cod 
+Figure (1): Before run the code 
 
 ![2](https://user-images.githubusercontent.com/64277741/183325953-2ecc2741-3d5c-4fe3-a951-56201a72cd20.png)
 
@@ -255,7 +255,7 @@ float y2;
 ![1](https://user-images.githubusercontent.com/64277741/183326947-43289a42-bef3-44eb-a923-3c2ccda88d6c.png)
 
 
-Figure (1): Befor run the cod 
+Figure (1): Before run the code 
 
 ![2](https://user-images.githubusercontent.com/64277741/183326967-b5cf4137-2dfd-4aa1-8bae-feba16ff2f0f.png)
 
